@@ -1,5 +1,5 @@
-#include <nlohmann/json.hpp>
 #include <vector>
+#include <nlohmann/json.hpp>
 #include "kuhn.hpp"
 
 namespace graph {
