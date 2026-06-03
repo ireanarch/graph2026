@@ -51,7 +51,8 @@ static void EmptyGraphTest(httplib::Client* cli) {
     nlohmann::json output = nlohmann::json::parse(res->body);
 
     int size = output.at("size").get<int>();
-    std::vector<int> matching = output.at("matching").get<std::vector<int>>();
+    std::vector<int> matching = output.at("matching")
+        .get<std::vector<int>>();
 
     REQUIRE_EQUAL(size, 0);
     REQUIRE_EQUAL(matching.size(), 0);
@@ -82,7 +83,8 @@ static void SimpleTest(httplib::Client* cli) {
     nlohmann::json output = nlohmann::json::parse(res->body);
 
     int size = output.at("size").get<int>();
-    std::vector<int> matching = output.at("matching").get<std::vector<int>>();
+    std::vector<int> matching = output.at("matching")
+        .get<std::vector<int>>();
 
     REQUIRE_EQUAL(size, 3);
     REQUIRE_EQUAL(matching.size(), 3);
@@ -101,7 +103,7 @@ static void RandomTest(httplib::Client* cli) {
  * @brief Вспомогательная функция для случайного теста.
  *
  * @param cli Указатель на HTTP клиент.
- * @param graphType Тип графа (не используется, но оставлено для единообразия).
+ * @param graphType Тип графа (не используется).
  */
 static void RandomTestHelper(httplib::Client* cli,
     const std::string& /* graphType */) {
@@ -138,7 +140,8 @@ static void RandomTestHelper(httplib::Client* cli,
 
         nlohmann::json output = nlohmann::json::parse(res->body);
         int size = output.at("size").get<int>();
-        std::vector<int> matching = output.at("matching").get<std::vector<int>>();
+        std::vector<int> matching = output.at("matching")
+            .get<std::vector<int>>();
 
         // Проверяем, что размер не превышает min(n, k)
         REQUIRE(size <= std::min(n, k));
@@ -146,7 +149,7 @@ static void RandomTestHelper(httplib::Client* cli,
         // Проверяем, что все индексы в допустимом диапазоне
         for (int i = 0; i < k; ++i) {
             if (matching[i] != -1) {
-                REQUIRE(matching[i] >= 0 && matching[i] < n);
+                REQUIRE((matching[i] >= 0 && matching[i] < n));
             }
         }
     }
