@@ -6,7 +6,6 @@
  */
 
 #include <httplib.h>
-#include <unordered_set>
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -17,8 +16,7 @@
 static void EmptyGraphTest(httplib::Client* cli);
 static void SimpleTest(httplib::Client* cli);
 static void RandomTest(httplib::Client* cli);
-static void RandomTestHelper(httplib::Client* cli,
-    const std::string& graphType);
+static void RandomTestHelper(httplib::Client* cli);
 
 void TestKuhn(httplib::Client* cli) {
     TestSuite suite("TestKuhn");
@@ -28,11 +26,6 @@ void TestKuhn(httplib::Client* cli) {
     RUN_TEST_REMOTE(suite, cli, RandomTest);
 }
 
-/**
- * @brief Тест для пустого графа.
- *
- * @param cli Указатель на HTTP клиент.
- */
 static void EmptyGraphTest(httplib::Client* cli) {
     nlohmann::json input = R"(
 {
@@ -58,11 +51,6 @@ static void EmptyGraphTest(httplib::Client* cli) {
     REQUIRE_EQUAL(matching.size(), 0);
 }
 
-/**
- * @brief Простейший статический тест.
- *
- * @param cli Указатель на HTTP клиент.
- */
 static void SimpleTest(httplib::Client* cli) {
     nlohmann::json input;
 
@@ -90,23 +78,11 @@ static void SimpleTest(httplib::Client* cli) {
     REQUIRE_EQUAL(matching.size(), 3);
 }
 
-/**
- * @brief Случайный тест.
- *
- * @param cli Указатель на HTTP клиент.
- */
 static void RandomTest(httplib::Client* cli) {
-    RandomTestHelper(cli, "Kuhn");
+    RandomTestHelper(cli);
 }
 
-/**
- * @brief Вспомогательная функция для случайного теста.
- *
- * @param cli Указатель на HTTP клиент.
- * @param graphType Тип графа (не используется).
- */
-static void RandomTestHelper(httplib::Client* cli,
-    const std::string& /* graphType */) {
+static void RandomTestHelper(httplib::Client* cli) {
     const int numTries = 100;
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -123,7 +99,6 @@ static void RandomTestHelper(httplib::Client* cli,
         input["k"] = k;
         input["g"] = std::vector<std::vector<int>>(n);
 
-        // Генерируем случайный двудольный граф
         for (int i = 0; i < n; ++i) {
             for (int j = 0; j < k; ++j) {
                 if (edgeDist(gen) == 1) {
@@ -143,10 +118,8 @@ static void RandomTestHelper(httplib::Client* cli,
         std::vector<int> matching = output.at("matching")
             .get<std::vector<int>>();
 
-        // Проверяем, что размер не превышает min(n, k)
         REQUIRE(size <= std::min(n, k));
 
-        // Проверяем, что все индексы в допустимом диапазоне
         for (int i = 0; i < k; ++i) {
             if (matching[i] != -1) {
                 REQUIRE((matching[i] >= 0 && matching[i] < n));

@@ -1,6 +1,8 @@
 /**
  * @file methods/main.cpp
  * @author Mikhail Lozhnikov
+ *
+ * Файл с функцией main() для серверной части программы.
  */
 
 #include <httplib.h>
@@ -25,11 +27,15 @@ int main(int argc, char* argv[]) {
         svr.stop();
         });
 
+    // Обработчик для алгоритма Куна (по образцу BFS)
     svr.Post("/Kuhn", [&](const httplib::Request& req, httplib::Response& res) {
         nlohmann::json input = nlohmann::json::parse(req.body);
         nlohmann::json output;
-        int code = graph::KuhnMethod(input, &output);
-        res.status = code == 0 ? 200 : 400;
+
+        // Если метод завершился с ошибкой, выставляем статус 400
+        if (graph::KuhnMethod(input, &output) < 0)
+            res.status = 400;
+
         res.set_content(output.dump(), "application/json");
         });
 
