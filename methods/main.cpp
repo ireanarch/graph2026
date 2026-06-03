@@ -1,4 +1,3 @@
-cat > methods / main.cpp << 'EOF'
 /**
  * @file methods/main.cpp
  * @author Mikhail Lozhnikov
