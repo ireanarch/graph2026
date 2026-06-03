@@ -1,6 +1,7 @@
 #include "kuhn.hpp"
 
 #include "gtest/gtest.h"
+
 #include <vector>
 
 namespace graph {
