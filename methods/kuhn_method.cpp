@@ -1,21 +1,61 @@
-#include "methods/methods.hpp"
-
+#include "kuhn.hpp"
+#include <nlohmann/json.hpp>
 #include <vector>
 
-#include "nlohmann/json.hpp"
-#include "kuhn.hpp"
+namespace graph {
 
-int KuhnMethod(const nlohmann::json& input, nlohmann::json* output) {
-    int n = input["n"].get<int>();
-    int k = input["k"].get<int>();
+    namespace {
 
-    std::vector<std::vector<int>> g(n);
-    for (const auto& edge : input["edges"]) {
-        g[edge[0].get<int>()].push_back(edge[1].get<int>());
+        bool Dfs(int v, const std::vector<std::vector<int>>& g,
+            std::vector<int>* mt, std::vector<bool>* used) {
+            if ((*used)[v]) return false;
+            (*used)[v] = true;
+
+            for (size_t i = 0; i < g[v].size(); ++i) {
+                int to = g[v][i];
+                if ((*mt)[to] == -1 || Dfs((*mt)[to], g, mt, used)) {
+                    (*mt)[to] = v;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+    }  // namespace
+
+    std::vector<int> Kuhn(int n, int k,
+        const std::vector<std::vector<int>>& g) {
+        std::vector<int> mt(k, -1);
+        std::vector<bool> used(n);
+
+        for (int v = 0; v < n; ++v) {
+            used.assign(n, false);
+            Dfs(v, g, &mt, &used);
+        }
+
+        return mt;
     }
 
-    std::vector<int> mt = graph::Kuhn(n, k, g);
-    (*output)["matching"] = mt;
+    int KuhnMethod(const nlohmann::json& input, nlohmann::json* output) {
+        try {
+            int n = input.at("n").get<int>();
+            int k = input.at("k").get<int>();
+            auto g = input.at("g").get<std::vector<std::vector<int>>>();
 
-    return 0;
-}
+            std::vector<int> mt = Kuhn(n, k, g);
+
+            (*output)["matching"] = mt;
+            int size = 0;
+            for (int i = 0; i < k; ++i) {
+                if (mt[i] != -1) ++size;
+            }
+            (*output)["size"] = size;
+            return 0;
+        }
+        catch (const std::exception& e) {
+            (*output)["error"] = e.what();
+            return 1;
+        }
+    }
+
+}  // namespace graph

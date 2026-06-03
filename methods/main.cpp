@@ -1,8 +1,6 @@
 /**
  * @file methods/main.cpp
  * @author Mikhail Lozhnikov
- *
- * Файл с функцией main() для серверной части программы.
  */
 
 #include <httplib.h>
@@ -11,13 +9,10 @@
 #include <nlohmann/json.hpp>
 #include "methods.hpp"
 
-    int main(int argc, char* argv[]) {
-    // Порт по-умолчанию.
+int main(int argc, char* argv[]) {
     int port = 8080;
 
     if (argc >= 2) {
-        // Меняем порт по умолчанию, если предоставлен соответствующий
-        // аргумент командной строки.
         if (std::sscanf(argv[1], "%d", &port) != 1)
             return -1;
     }
@@ -26,29 +21,19 @@
 
     httplib::Server svr;
 
-    // Обработчик для GET запроса по адресу /stop. Этот обработчик
-    // останавливает сервер.
     svr.Get("/stop", [&](const httplib::Request&, httplib::Response&) {
         svr.stop();
         });
 
-    /* Сюда нужно вставить обработчик post запроса для алгоритма. */
-
-    // Обработчик для алгоритма Куна (максимальное паросочетание)
     svr.Post("/Kuhn", [&](const httplib::Request& req, httplib::Response& res) {
         nlohmann::json input = nlohmann::json::parse(req.body);
         nlohmann::json output;
-        int code = KuhnMethod(input, &output);
+        int code = graph::KuhnMethod(input, &output);
         res.status = code == 0 ? 200 : 400;
         res.set_content(output.dump(), "application/json");
         });
 
-    /* Конец вставки. */
-
-    // Эта функция запускает сервер на указанном порту. Программа не завершится
-    // до тех пор, пока сервер не будет остановлен.
     svr.listen("0.0.0.0", port);
 
     return 0;
 }
-EOF
