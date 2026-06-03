@@ -1,7 +1,6 @@
-#include "kuhn.hpp"
-
 #include <nlohmann/json.hpp>
 #include <vector>
+#include "kuhn.hpp"
 
 namespace graph {
 
