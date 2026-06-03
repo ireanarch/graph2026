@@ -1,8 +1,9 @@
+cat > methods / main.cpp << 'EOF'
 /**
  * @file methods/main.cpp
  * @author Mikhail Lozhnikov
  *
- * Файл с функией main() для серверной части программы.
+ * Файл с функцией main() для серверной части программы.
  */
 
 #include <httplib.h>
@@ -11,38 +12,44 @@
 #include <nlohmann/json.hpp>
 #include "methods.hpp"
 
+    int main(int argc, char* argv[]) {
+    // Порт по-умолчанию.
+    int port = 8080;
 
+    if (argc >= 2) {
+        // Меняем порт по умолчанию, если предоставлен соответствующий
+        // аргумент командной строки.
+        if (std::sscanf(argv[1], "%d", &port) != 1)
+            return -1;
+    }
 
-int main(int argc, char* argv[]) {
-  // Порт по-умолчанию.
-  int port = 8080;
+    std::cerr << "Listening on port " << port << "..." << std::endl;
 
-  if (argc >= 2) {
-    // Меняем порт по умолчанию, если предоставлен соответствующий
-    // аргумент командной строки.
-    if (std::sscanf(argv[1], "%d", &port) != 1)
-      return -1;
-  }
+    httplib::Server svr;
 
-  std::cerr << "Listening on port " << port << "..." << std::endl;
+    // Обработчик для GET запроса по адресу /stop. Этот обработчик
+    // останавливает сервер.
+    svr.Get("/stop", [&](const httplib::Request&, httplib::Response&) {
+        svr.stop();
+        });
 
-  httplib::Server svr;
+    /* Сюда нужно вставить обработчик post запроса для алгоритма. */
 
-  // Обработчик для GET запроса по адресу /stop. Этот обработчик
-  // останавливает сервер.
-  svr.Get("/stop", [&](const httplib::Request&, httplib::Response&) {
-    svr.stop();
-  });
+    // Обработчик для алгоритма Куна (максимальное паросочетание)
+    svr.Post("/Kuhn", [&](const httplib::Request& req, httplib::Response& res) {
+        nlohmann::json input = nlohmann::json::parse(req.body);
+        nlohmann::json output;
+        int code = KuhnMethod(input, &output);
+        res.status = code == 0 ? 200 : 400;
+        res.set_content(output.dump(), "application/json");
+        });
 
-  /* Сюда нужно вставить обработчик post запроса для алгоритма. */
+    /* Конец вставки. */
 
+    // Эта функция запускает сервер на указанном порту. Программа не завершится
+    // до тех пор, пока сервер не будет остановлен.
+    svr.listen("0.0.0.0", port);
 
-
-  /* Конец вставки. */
-
-  // Эта функция запускает сервер на указанном порту. Программа не завершится
-  // до тех пор, пока сервер не будет остановлен.
-  svr.listen("0.0.0.0", port);
-
-  return 0;
+    return 0;
 }
+EOF
