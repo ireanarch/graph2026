@@ -36,14 +36,6 @@ namespace graph {
         return mt;
     }
 
-    /**
-     * @brief Метод для запуска алгоритма Куна из JSON.
-     *
-     * @param input Входные данные в формате JSON.
-     * @param output Выходные данные в формате JSON.
-     * @return Функция возвращает 0 в случае успеха и отрицательное число
-     *         если входные данные заданы некорректно.
-     */
     int KuhnMethod(const nlohmann::json& input, nlohmann::json* output) {
         try {
             int n = input.at("n").get<int>();
@@ -63,7 +55,7 @@ namespace graph {
         }
         catch (const std::exception& e) {
             (*output)["error"] = e.what();
-            return -1;  // отрицательное число при ошибке
+            return -1;
         }
     }
 

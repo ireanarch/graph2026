@@ -13,18 +13,6 @@
 namespace graph {
 
     /**
-     * @brief Вспомогательная функция для поиска увеличивающей цепи (DFS).
-     *
-     * @param v Текущая вершина левой доли.
-     * @param g Список смежности (граф).
-     * @param mt Массив паросочетания.
-     * @param used Массив посещённых вершин.
-     * @return true если удалось найти увеличивающую цепь, false иначе.
-     */
-    bool Dfs(int v, const std::vector<std::vector<int>>& g,
-        std::vector<int>& mt, std::vector<bool>& used);
-
-    /**
      * @brief Алгоритм Куна для поиска максимального паросочетания.
      *
      * @param n Количество вершин в левой доле.

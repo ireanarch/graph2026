@@ -12,7 +12,7 @@
 
 namespace graph {
 
-	int KuhnMethod(const nlohmann::json& input, nlohmann::json* output);
+int KuhnMethod(const nlohmann::json& input, nlohmann::json* output);
 
 }  // namespace graph
 
